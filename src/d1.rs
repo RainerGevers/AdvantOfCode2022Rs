@@ -32,18 +32,16 @@ fn main() {
 }
 
 fn get_top_n_values(hash: &HashMap<i32,i32>, n: i32) -> Vec<i32> {
-
-    // Create a new vector to store the values
     let mut values = Vec::new();
-    // Iterate over the hashmap values and push them to the vector
+
     for value in hash.values() {
         values.push(*value);
     }
-    // Sort the vector in descending order
+
     values.sort();
     values.reverse();
-    // Truncate the vector to keep only the first N elements
+
     values.truncate(n as usize);
-    // Return the vector as the result
+
     values
 }
