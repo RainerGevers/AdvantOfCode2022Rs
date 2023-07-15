@@ -43,8 +43,37 @@ impl FromStr for Hand {
     }
 }
 
-
 fn main() {
+    part1();
+    part2();
+}
+
+fn part1() {
+    let file = File::open("files/q2.txt").unwrap();
+    let reader = BufReader::new(file);
+
+    let mut points: i32 = 0;
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+
+        let moves: Vec<&str> = line.split(" ").collect();
+
+        let opponent_move = moves[0].parse::<Hand>().unwrap();
+        let our_move = moves[1].parse::<Hand>().unwrap();
+
+        match opponent_move.partial_cmp(&our_move) {
+            Some(Ordering::Equal) => {points += 3 + our_move as i32},
+            Some(Ordering::Greater) => {points += our_move as i32},
+            Some(Ordering::Less) => {points += 6 + our_move as i32},
+            _ => panic!("Issue with compare")
+        }
+    }
+
+    println!("Part 1: {}", points);
+}
+
+fn part2() {
     let file = File::open("files/q2.txt").unwrap();
     let reader = BufReader::new(file);
 
@@ -84,5 +113,4 @@ fn main() {
     }
 
     println!("{}", points);
-
 }
