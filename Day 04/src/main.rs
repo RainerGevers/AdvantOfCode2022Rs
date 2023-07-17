@@ -18,9 +18,13 @@ fn main() {
 fn part1() {
     let ranges = read_ranges("files/data.txt");
 
+    let contains = |low: &NumRange, high: &NumRange| -> bool {
+        (low.low >= high.low && low.high <= high.high) || (high.low >= low.low && high.high <= low.high)
+    };
+
     let overlap = ranges
         .iter()
-        .filter(|(low, high)| (low.low >= high.low && low.high <= high.high) || (high.low >= low.low && high.high <= low.high))
+        .filter(|(low, high)| contains(low, high) )
         .count();
 
     println!("Complete overlapping ranges: {}", overlap);
@@ -29,9 +33,13 @@ fn part1() {
 fn part2() {
     let ranges = read_ranges("files/data.txt");
 
+    let overlaps = |low: &NumRange, high: &NumRange| -> bool {
+        (low.low <= high.high && low.high >= high.low) || (high.low <= low.high && high.high >= low.low)
+    };
+
     let overlap = ranges
         .iter()
-        .filter(|(low, high)| (low.low <= high.high && low.high >= high.low) || (high.low <= low.high && high.high >= low.low))
+        .filter(|(low, high)| overlaps(low, high))
         .count();
 
     println!("Overlapping ranges: {}", overlap);
