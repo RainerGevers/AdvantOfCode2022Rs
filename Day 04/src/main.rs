@@ -1,4 +1,8 @@
-use std::{fs::File, io::{BufReader, BufRead}};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    path::Path,
+};
 
 #[derive(Debug)]
 struct NumRange {
@@ -12,69 +16,51 @@ fn main() {
 }
 
 fn part1() {
-    let ranges = read_ranges();
+    let ranges = read_ranges("files/data.txt");
 
-    let mut overlap = 0;
-
-    for (low, high) in ranges {
-        if low.low >= high.low && low.high <= high.high {
-            overlap += 1;
-            continue;
-        }
-
-        if high.low >= low.low && high.high <= low.high {
-            overlap += 1;
-            continue;
-        }
-    }
+    let overlap = ranges
+        .iter()
+        .filter(|(low, high)| (low.low >= high.low && low.high <= high.high) || (high.low >= low.low && high.high <= low.high))
+        .count();
 
     println!("Complete overlapping ranges: {}", overlap);
 }
 
 fn part2() {
-    let ranges = read_ranges();
+    let ranges = read_ranges("files/data.txt");
 
-    let mut overlap = 0;
-
-    for (low, high) in ranges {
-        if low.low <= high.high && low.high >= high.low   {
-            overlap += 1;
-            continue;
-        }
-
-        if high.low <= low.high && high.high >= low.low {
-            overlap += 1;
-            continue;
-        }
-    }
+    let overlap = ranges
+        .iter()
+        .filter(|(low, high)| (low.low <= high.high && low.high >= high.low) || (high.low <= low.high && high.high >= low.low))
+        .count();
 
     println!("Overlapping ranges: {}", overlap);
 }
 
-fn read_ranges() -> Vec<(NumRange, NumRange)> {
-    let file = File::open("files/data.txt").unwrap();
+fn read_ranges<P: AsRef<Path>>(file_path: P) -> Vec<(NumRange, NumRange)> {
+    let file = File::open(file_path).expect("Failed to open file");
     let reader = BufReader::new(file);
 
-    let mut ranges: Vec<(NumRange, NumRange)> = vec![];
-    for line in reader.lines() {
-        let line = line.unwrap();
-        let components: Vec<&str> = line.split(',').collect();
+    reader
+        .lines()
+        .map(|line| {
+            let line = line.expect("Failed to read line");
+            let components: Vec<&str> = line.split(',').collect();
 
-        let part1: Vec<&str> = components[0].split('-').collect();
-        let part2: Vec<&str> = components[1].split('-').collect();
+            let part1: Vec<&str> = components[0].split('-').collect();
+            let part2: Vec<&str> = components[1].split('-').collect();
 
-        let p1 = NumRange {
-            low: part1[0].parse().unwrap(),
-            high: part1[1].parse().unwrap()
-        };
+            let p1 = NumRange {
+                low: part1[0].parse().expect("Failed to parse number"),
+                high: part1[1].parse().expect("Failed to parse number"),
+            };
 
-        let p2 = NumRange {
-            low: part2[0].parse().unwrap(),
-            high: part2[1].parse().unwrap()
-        };
+            let p2 = NumRange {
+                low: part2[0].parse().expect("Failed to parse number"),
+                high: part2[1].parse().expect("Failed to parse number"),
+            };
 
-        ranges.push((p1, p2))
-    }
-
-    ranges
+            (p1, p2)
+        })
+        .collect()
 }
